@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum DogSize {
+  S
+  M
+  L
+}
+
+enum EnergyLevel {
+  LOW
+  MED
+  HIGH
+}
+
+enum PlayStyle {
+  GENTLE
+  CHASE
+  WRESTLE
+}
+
+enum Neighborhood {
+  SODERMALM
+  KUNGSHOLMEN
+  VASASTAN
+  OSTERMALM
+  NORRMALM
+  GAMLA_STAN
+  BROMMA
+  HAGERSTEN_LILJEHOLMEN
+  ENSKEDE_ARSTA_VANTOR
+  SKARPNACK
+}
+
+model Dog {
+  id           String       @id @default(cuid())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  name         String
+  bio          String       @default("")
+  size         DogSize
+  energy       EnergyLevel
+  neighborhood Neighborhood
+
+  playStyles   DogPlayStyle[]
+
+  // Safety and compatibility notes (free text for v0)
+  notes        String       @default("")
+
+  // Simple public visibility switch
+  isActive     Boolean      @default(true)
+
+  @@index([neighborhood, size, energy])
+  @@index([createdAt])
+}
+
+model DogPlayStyle {
+  id        String    @id @default(cuid())
+  dogId     String
+  style     PlayStyle
+  createdAt DateTime  @default(now())
+
+  dog       Dog       @relation(fields: [dogId], references: [id], onDelete: Cascade)
+
+  @@unique([dogId, style])
+  @@index([style])
+}
