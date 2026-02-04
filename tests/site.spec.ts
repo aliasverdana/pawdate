@@ -15,13 +15,19 @@ test("create dog profile flow", async ({ page }) => {
   await page.goto("/dogs/new");
   await expect(page.getByRole("heading", { name: "Create dog profile" })).toBeVisible();
 
-  await page.getByLabel("Dog name").fill("TestDog");
+  const dogName = `TestDog-${Date.now()}`;
+  await page.getByLabel("Dog name").fill(dogName);
   await page.getByLabel("Short bio").fill("QA dog");
   await page.getByRole("button", { name: "Create" }).click();
 
-  // After submit, the server action returns void (no redirect). Go to list.
+  // Give the deployment a moment to write to the DB
+  await page.waitForTimeout(1000);
+
   await page.goto("/dogs");
-  await expect(page.getByRole("heading", { name: "TestDog" }).first()).toBeVisible();
+  await page.waitForTimeout(1000);
+
+  // Retry a few times (network + serverless cold starts)
+  await expect(page.getByRole("heading", { name: dogName }).first()).toBeVisible({ timeout: 15000 });
 });
 
 test("static pages load", async ({ page }) => {

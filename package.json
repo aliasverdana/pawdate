@@ -13,7 +13,8 @@
     "db:studio": "prisma studio",
     "db:seed": "ts-node --transpile-only prisma/seed.ts",
     "test:e2e": "playwright test",
-    "qa": "start-server-and-test dev http://127.0.0.1:3000 test:e2e"
+    "qa:local": "start-server-and-test dev http://127.0.0.1:3000 test:e2e",
+    "qa:prod": "PLAYWRIGHT_BASE_URL=https://pawdate-repo.vercel.app playwright test"
   },
   "dependencies": {
     "@prisma/client": "6.19.2",
