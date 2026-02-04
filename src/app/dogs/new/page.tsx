@@ -36,21 +36,21 @@ export default async function NewDogPage() {
                   <Text size="2" weight="medium">
                     Dog name
                   </Text>
-                  <TextField.Root name="name" placeholder="Luna" required />
+                  <TextField.Root name="name" aria-label="Dog name" placeholder="Luna" required />
                 </Flex>
 
                 <Flex direction="column" gap="2">
                   <Text size="2" weight="medium">
                     Short bio
                   </Text>
-                  <TextArea name="bio" placeholder="Friendly, enjoys calm walks." />
+                  <TextArea name="bio" aria-label="Short bio" placeholder="Friendly, enjoys calm walks." />
                 </Flex>
 
                 <Flex direction="column" gap="2">
                   <Text size="2" weight="medium">
                     Notes
                   </Text>
-                  <TextArea name="notes" placeholder="Triggers, boundaries, introduction preferences." />
+                  <TextArea name="notes" aria-label="Notes" placeholder="Triggers, boundaries, introduction preferences." />
                 </Flex>
 
                 <Flex gap="4" wrap="wrap">
