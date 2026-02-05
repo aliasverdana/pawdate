@@ -1,18 +1,28 @@
 import { Box, Container, Flex, Heading, Text } from "@radix-ui/themes";
 import { PageEnter } from "@/components/PageEnter";
-import { LoginPanel } from "@/components/LoginPanel";
+import { DescopeLogin } from "@/components/DescopeLogin";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirectTo?: string }>;
+}) {
+  const projectId = process.env.NEXT_PUBLIC_DESCOPE_PROJECT_ID;
+  const { redirectTo } = await searchParams;
+
   return (
     <Box py="6">
       <Container size="2">
         <PageEnter>
           <Flex direction="column" gap="4">
             <Heading size="7">Login</Heading>
-            <Text color="gray">
-              Keep your dog profile private until you&apos;re ready. Login enables posting requests and messaging.
-            </Text>
-            <LoginPanel />
+            <Text color="gray">Sign in to create requests and message owners.</Text>
+
+            {projectId ? (
+              <DescopeLogin projectId={projectId} redirectTo={redirectTo || "/dogs"} />
+            ) : (
+              <Text color="gray">Missing NEXT_PUBLIC_DESCOPE_PROJECT_ID.</Text>
+            )}
           </Flex>
         </PageEnter>
       </Container>
