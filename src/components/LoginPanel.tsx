@@ -9,6 +9,14 @@ type Step = "methods" | "email";
 
 export function LoginPanel() {
   const [step, setStep] = React.useState<Step>("methods");
+  const [email, setEmail] = React.useState("");
+
+  const projectId = process.env.NEXT_PUBLIC_DESCOPE_PROJECT_ID;
+  const baseUrl = process.env.NEXT_PUBLIC_DESCOPE_BASE_URL || "https://api.descope.com";
+
+  const descopeHosted = projectId
+    ? `https://app.descope.com/${projectId}/login`
+    : null;
 
   return (
     <Card size="4">
@@ -23,23 +31,27 @@ export function LoginPanel() {
           >
             <Flex direction="column" gap="4">
               <Heading size="6">Log in</Heading>
-              <Text color="gray">
-                Sign in to create requests and message owners. (UI only in v0)
-              </Text>
+              <Text color="gray">Sign in to create requests and message owners.</Text>
 
               <Flex direction="column" gap="2">
                 <Button disabled>Continue with Google</Button>
                 <Button disabled variant="soft">
                   Continue with Apple
                 </Button>
-                <Button variant="soft" onClick={() => setStep("email")}
-                >
-                  Continue with email
-                </Button>
+
+                {descopeHosted ? (
+                  <Button asChild variant="soft">
+                    <a href={descopeHosted}>Continue with email</a>
+                  </Button>
+                ) : (
+                  <Button variant="soft" onClick={() => setStep("email")}>
+                    Continue with email
+                  </Button>
+                )}
               </Flex>
 
               <Text size="2" color="gray">
-                By continuing, you agree to our Terms and Privacy Policy.
+                Auth is powered by Descope.
               </Text>
             </Flex>
           </motion.div>
@@ -60,15 +72,23 @@ export function LoginPanel() {
               </Flex>
 
               <Heading size="6">Email login</Heading>
-              <Text color="gray">Enter your email to receive a magic link.</Text>
+              <Text color="gray">This route uses Descope. Use hosted login in production.</Text>
 
               <Flex direction="column" gap="2">
-                <TextField.Root aria-label="Email" placeholder="you@example.com" type="email" />
-                <Button disabled>Send magic link</Button>
+                <TextField.Root
+                  aria-label="Email"
+                  placeholder="you@example.com"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
+                <Button disabled>
+                  Send magic link (disabled)
+                </Button>
               </Flex>
 
               <Text size="2" color="gray">
-                In production, this will use Auth.js / NextAuth email provider.
+                Base URL: {baseUrl}
               </Text>
             </Flex>
           </motion.div>

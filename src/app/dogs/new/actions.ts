@@ -49,7 +49,7 @@ export async function createDog(formData: FormData): Promise<void> {
 
   await prisma.dog.create({
     data: {
-      ownerId: user.id,
+      ownerId: user.userId,
       name: d.name,
       bio: d.bio ?? "",
       notes: d.notes ?? "",

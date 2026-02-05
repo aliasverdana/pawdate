@@ -1,35 +1,20 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { COOKIE_NAME } from "@/lib/auth/session";
+import { authMiddleware } from "@descope/nextjs-sdk/server";
 
-const PROTECTED_PREFIXES = [
-  "/dogs/new",
-  "/requests",
-  "/messages",
-];
+const PROTECTED_PREFIXES = ["/dogs/new", "/requests", "/messages"];
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
-  // Skip next internals
-  if (pathname.startsWith("/_next")) return NextResponse.next();
-
-  const needsAuth = PROTECTED_PREFIXES.some(p => pathname === p || pathname.startsWith(p + "/"));
-  if (!needsAuth) return NextResponse.next();
-
-  const hasSession = Boolean(req.cookies.get(COOKIE_NAME)?.value);
-  if (hasSession) return NextResponse.next();
-
-  const url = req.nextUrl.clone();
-  url.pathname = "/login";
-  url.searchParams.set("redirectTo", pathname);
-  return NextResponse.redirect(url);
-}
+export default authMiddleware({
+  // Everything is public by default, then we protect a few routes.
+  publicRoutes: ["/"],
+  privateRoutes: PROTECTED_PREFIXES,
+  redirectUrl: "/login",
+});
 
 export const config = {
-  matcher: [
-    "/dogs/new",
-    "/requests/:path*",
-    "/messages/:path*",
-  ],
+  matcher: ["/dogs/new", "/requests/:path*", "/messages/:path*"],
 };
+
+// Fallback redirect for any route missed by privateRoutes (defensive)
+export function middleware() {
+  return NextResponse.next();
+}

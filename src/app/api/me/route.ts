@@ -1,21 +1,20 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth/session";
-import { prisma } from "@/lib/prisma";
+import { session } from "@descope/nextjs-sdk/server";
 
 export async function GET() {
-  const session = await getSessionUser();
-  if (!session) return NextResponse.json({ user: null }, { status: 200 });
+  const s = await session();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sAny = s as any;
+  const isAuthenticated = Boolean(sAny?.isAuthenticated);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.id },
-    select: {
-      id: true,
-      email: true,
-      displayName: true,
-      emailVerified: true,
-      neighborhood: true,
+  if (!isAuthenticated) {
+    return NextResponse.json({ user: null }, { status: 401 });
+  }
+
+  return NextResponse.json({
+    user: {
+      userId: sAny?.userId,
+      email: sAny?.email,
     },
   });
-
-  return NextResponse.json({ user });
 }
