@@ -45,8 +45,11 @@ export async function createDog(formData: FormData): Promise<void> {
 
   const d = parsed.data;
 
+  const user = await (await import("@/lib/auth/requireUser")).requireUser("/dogs/new");
+
   await prisma.dog.create({
     data: {
+      ownerId: user.id,
       name: d.name,
       bio: d.bio ?? "",
       notes: d.notes ?? "",
