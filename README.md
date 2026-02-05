@@ -9,10 +9,32 @@ Find compatible dog playdates in Stockholm.
 
 ## Local dev
 
+1) Configure env
+
+```bash
+cp .env.local.example .env.local
+```
+
+Fill in at least:
+- `DATABASE_URL`
+- `AUTH_JWT_SECRET`
+- `RESEND_API_KEY` (optional in dev; links will be logged if missing)
+
+2) Install + migrate + run
+
 ```bash
 npm install
+npx prisma migrate dev
 npm run dev
 ```
+
+## Auth (magic link)
+
+Backend endpoints:
+- `POST /api/auth/magic-link` → `{ email, redirectTo? }` (creates a short-lived token and emails a sign-in link)
+- `GET /api/auth/verify?token=...&redirectTo=/...` (consumes token, sets `pawdate_session` cookie)
+- `POST /api/auth/logout`
+- `GET /api/me`
 
 ## Roadmap (v0)
 

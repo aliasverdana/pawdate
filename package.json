@@ -17,18 +17,24 @@
     "qa:prod": "PLAYWRIGHT_BASE_URL=https://pawdate-repo.vercel.app playwright test"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "6.19.2",
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/themes": "^3.3.0",
+    "motion": "^12.31.0",
     "next": "16.1.6",
+    "next-auth": "^4.24.13",
     "prisma": "6.19.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "resend": "^6.9.1",
+    "jose": "^6.1.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.1",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
