@@ -1,5 +1,6 @@
 import { Box, Button, Card, CheckboxGroup, Container, Flex, Heading, Select, Text, TextArea, TextField } from "@radix-ui/themes";
 import Link from "next/link";
+import { PageEnter } from "@/components/PageEnter";
 import { createDog } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -21,23 +22,24 @@ export default async function NewDogPage() {
   return (
     <Box py="6">
       <Container size="3">
-        <Flex direction="column" gap="4">
-          <Flex align="center" justify="between" wrap="wrap" gap="3">
-            <Heading size="7">Create dog profile</Heading>
-            <Button asChild variant="soft">
-              <Link href="/dogs">Back to dogs</Link>
-            </Button>
-          </Flex>
+        <PageEnter>
+          <Flex direction="column" gap="4">
+            <Flex align="center" justify="between" wrap="wrap" gap="3">
+              <Heading size="7">Create dog profile</Heading>
+              <Button asChild variant="soft">
+                <Link href="/dogs">Back to dogs</Link>
+              </Button>
+            </Flex>
 
-          <Card>
-            <form action={createDog}>
-              <Flex direction="column" gap="4">
-                <Flex direction="column" gap="2">
-                  <Text size="2" weight="medium">
-                    Dog name
-                  </Text>
-                  <TextField.Root name="name" aria-label="Dog name" placeholder="Luna" required />
-                </Flex>
+            <Card>
+              <form action={createDog}>
+                <Flex direction="column" gap="4">
+                  <Flex direction="column" gap="2">
+                    <Text size="2" weight="medium">
+                      Dog name
+                    </Text>
+                    <TextField.Root name="name" aria-label="Dog name" placeholder="Luna" required />
+                  </Flex>
 
                 <Flex direction="column" gap="2">
                   <Text size="2" weight="medium">
@@ -120,10 +122,11 @@ export default async function NewDogPage() {
                 <Text size="2" color="gray">
                   This is v0. Use public meeting spots and do a short intro on leash.
                 </Text>
-              </Flex>
-            </form>
-          </Card>
-        </Flex>
+                </Flex>
+              </form>
+            </Card>
+          </Flex>
+        </PageEnter>
       </Container>
     </Box>
   );

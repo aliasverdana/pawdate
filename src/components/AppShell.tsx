@@ -16,6 +16,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link href="/dogs">Dogs</Link>
               </RadixLink>
               <RadixLink asChild>
+                <Link href="/requests">Requests</Link>
+              </RadixLink>
+              <RadixLink asChild>
+                <Link href="/messages">Messages</Link>
+              </RadixLink>
+              <RadixLink asChild>
+                <Link href="/login">Login</Link>
+              </RadixLink>
+              <RadixLink asChild>
                 <Link href="/safety">Safety</Link>
               </RadixLink>
               <RadixLink asChild>

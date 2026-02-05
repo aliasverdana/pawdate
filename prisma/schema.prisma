@@ -38,6 +38,56 @@ enum Neighborhood {
   SKARPNACK
 }
 
+enum PlaydateRequestStatus {
+  OPEN
+  MATCHED
+  CLOSED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  email         String   @unique
+  emailVerified DateTime?
+  displayName   String?
+
+  // Optional location signal; dogs and requests can override.
+  neighborhood  Neighborhood?
+
+  dogs          Dog[]
+  dogPhotos     DogPhoto[] @relation("UserDogPhotos")
+
+  playdateRequests PlaydateRequest[] @relation("PlaydateRequestAuthor")
+
+  threads       ThreadParticipant[]
+  messages      Message[]
+
+  magicLinkTokens MagicLinkToken[]
+
+  @@index([createdAt])
+}
+
+model MagicLinkToken {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  email       String
+  tokenHash   String   @unique
+  expiresAt   DateTime
+  consumedAt  DateTime?
+
+  // Where to send the user after verification (path or absolute URL)
+  redirectTo  String?
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email, createdAt])
+  @@index([expiresAt])
+}
+
 model Dog {
   id           String       @id @default(cuid())
   createdAt    DateTime     @default(now())
@@ -50,6 +100,7 @@ model Dog {
   neighborhood Neighborhood
 
   playStyles   DogPlayStyle[]
+  photos       DogPhoto[]
 
   // Safety and compatibility notes (free text for v0)
   notes        String       @default("")
@@ -57,8 +108,14 @@ model Dog {
   // Simple public visibility switch
   isActive     Boolean      @default(true)
 
+  ownerId      String?
+  owner        User?        @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  playdateRequests PlaydateRequest[]
+
   @@index([neighborhood, size, energy])
   @@index([createdAt])
+  @@index([ownerId])
 }
 
 model DogPlayStyle {
@@ -71,4 +128,96 @@ model DogPlayStyle {
 
   @@unique([dogId, style])
   @@index([style])
+}
+
+model DogPhoto {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  dogId       String
+  dog         Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+
+  // Optional uploader (useful for moderation/audit)
+  uploadedById String?
+  uploadedBy   User?    @relation("UserDogPhotos", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  url         String
+  alt         String   @default("")
+  isPrimary   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+
+  @@index([dogId, sortOrder])
+  @@index([dogId, isPrimary])
+}
+
+model PlaydateRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Requests are lightweight “who wants to meet” posts tied to a dog.
+  dogId     String
+  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+
+  // Optional creator (can be inferred from dog.ownerId, but explicit is helpful).
+  createdById String?
+  createdBy   User?    @relation("PlaydateRequestAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+
+  neighborhood Neighborhood
+  placeName    String
+  startsAt     DateTime
+  endsAt       DateTime?
+
+  note      String  @default("")
+  isOpen    Boolean @default(true)
+
+  @@index([isOpen, startsAt])
+  @@index([neighborhood, isOpen, startsAt])
+  @@index([dogId, startsAt])
+  @@index([createdById, createdAt])
+}
+
+model Thread {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Optional reference to a playdate request that initiated the chat.
+  playdateRequestId String?
+
+  participants ThreadParticipant[]
+  messages     Message[]
+
+  @@index([createdAt])
+}
+
+model ThreadParticipant {
+  id        String   @id @default(cuid())
+  threadId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  thread    Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  lastReadAt DateTime?
+
+  @@unique([threadId, userId])
+  @@index([userId, createdAt])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  threadId  String
+  thread    Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  body      String
+
+  @@index([threadId, createdAt])
+  @@index([senderId, createdAt])
 }
